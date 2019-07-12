@@ -1,0 +1,17 @@
+{
+  "name": "cockroach",
+  "version": "0.0.1",
+  "description": "cockroach client based on pg",
+  "main": "main.js",
+  "keywords": [
+    "cockroach",
+    "cockroachdb",
+    "db",
+    "crdb"
+  ],
+  "author": "Clément Wiz <wiz@haxx.es>",
+  "license": "ISC",
+  "dependencies": {
+    "pg": "^7.11.0"
+  }
+}
