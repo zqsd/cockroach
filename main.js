@@ -22,6 +22,9 @@ async function transaction(op, client) {
             }
         }
     }
+    if(lastError) {
+        throw lastError;
+    }
     client.release();
 }
 
