@@ -14,7 +14,7 @@ async function transaction(op, client) {
             lastError = err;
             // retryable error
             if(err.code === '40001') {
-                await client.query('ROLLBACK TO SAVEPOINT cockroach_restart;', done);
+                await client.query('ROLLBACK TO SAVEPOINT cockroach_restart;');
             }
             // non-retryable error
             else {
