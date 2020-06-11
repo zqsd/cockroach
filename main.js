@@ -1,45 +1,28 @@
-const pg = require('pg');
+const fs = require('fs');
+const {Pool} = require('pg');
+const {transaction, TransactionCancelError} = require('./transaction');
 
-async function transaction(op, client) {
-    await client.query('BEGIN; SAVEPOINT cockroach_restart;');
-
-    let lastError;
-    for(let attempts = 3; attempts > 0; attempts--) {
-        try {
-            result = await op(client);
-            await client.query('RELEASE SAVEPOINT cockroach_restart; COMMIT;');
-            return result;
-        }
-        catch(err) {
-            lastError = err;
-            // retryable error
-            if(err.code === '40001') {
-                await client.query('ROLLBACK TO SAVEPOINT cockroach_restart;');
-            }
-            // non-retryable error
-            else {
-                break;
-            }
-        }
-    }
-    if(lastError) {
-        throw lastError;
-    }
-    client.release();
-}
-
-class Pool extends pg.Pool {
-    constructor(...args) {
-        super(...args);
-        this.transaction = async (op) => {
-            const client = await this.connect();
-            const result = await transaction(op, client);
-            client.release();
-            return result;
+function createPool() {
+    const config = {
+        host: process.env.PGHOST || '127.0.0.1',
+        port: process.env.PGPORT || 26257,
+    };
+    if (process.env.PGSSLROOTCERT && process.env.PGSSLKEY && process.env.PGSSLCERT) {
+        config.ssl = {
+            ca: fs.readFileSync(process.env.PGSSLROOTCERT).toString(),
+            key: fs.readFileSync(process.env.PGSSLKEY).toString(),
+            cert: fs.readFileSync(process.env.PGSSLCERT).toString(),
         };
     }
-}
+
+    const pool = new Pool(config);
+
+    pool.transaction = transaction(pool);
+
+    return pool;
+};
 
 module.exports = {
-    Pool,
+    createPool,
+    TransactionCancelError,
 };
