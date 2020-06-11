@@ -12,6 +12,6 @@
   "author": "Clément Wiz <wiz@haxx.es>",
   "license": "ISC",
   "dependencies": {
-    "pg": "^7.11.0"
+    "pg": "^8.2.1"
   }
 }
