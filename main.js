@@ -6,6 +6,8 @@ function createPool() {
     const config = {
         host: process.env.PGHOST || '127.0.0.1',
         port: process.env.PGPORT || 26257,
+        user: process.env.PGUSER,
+        database: process.env.PGDATABASE,
     };
     if (process.env.PGSSLROOTCERT && process.env.PGSSLKEY && process.env.PGSSLCERT) {
         config.ssl = {
