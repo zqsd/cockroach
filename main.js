@@ -1,19 +1,21 @@
 const fs = require('fs');
 const {Pool} = require('pg');
+const path = require('path');
 const {transaction, TransactionCancelError} = require('./transaction');
 
 function createPool() {
     const config = {
-        host: process.env.PGHOST || '127.0.0.1',
-        port: process.env.PGPORT || 26257,
-        user: process.env.PGUSER,
-        database: process.env.PGDATABASE,
+        host: process.env.COCKROACH_HOST || '127.0.0.1',
+        port: process.env.COCKROACH_PORT || 26257,
+        user: process.env.COCKROACH_USER || 'root',
+        database: process.env.COCKROACH_DATABASE || 'defaultdb',
     };
-    if (process.env.PGSSLROOTCERT && process.env.PGSSLKEY && process.env.PGSSLCERT) {
+    const insecure = process.env.COCKROACH_INSECURE ? process.env.COCKROACH_INSECURE == 'true' : true;
+    if(process.env.COCKROACH_CERTS_DIR && !insecure) {
         config.ssl = {
-            ca: fs.readFileSync(process.env.PGSSLROOTCERT).toString(),
-            key: fs.readFileSync(process.env.PGSSLKEY).toString(),
-            cert: fs.readFileSync(process.env.PGSSLCERT).toString(),
+            ca: fs.readFileSync(path.join(process.env.COCKROACH_CERTS_DIR, 'ca.crt')).toString(),
+            key: fs.readFileSync(path.join(process.env.COCKROACH_CERTS_DIR, `client.${config.user}.key`)).toString(),
+            cert: fs.readFileSync(path.join(process.env.COCKROACH_CERTS_DIR, `client.${config.user}.crt`)).toString(),
         };
     }
 
