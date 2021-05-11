@@ -32,11 +32,36 @@ export default class CockroachDB extends Queryable {
         return transaction();
     }
 
-    // nested transaction?
-    async transaction(op, optionnalConnection, attempts = 3) {
-        const client = optionnalConnection || await this._queryable.connect();
-        
-    }
+    async transaction(op, attempts = 3) {
+        const client = await this._queryable.connect();
+        const transaction = new Transaction(client);
 
-    // ensure transaction
+        await transaction.begin();
+
+        let result, ran = false;
+        for(let i = 0; i < attempts; i++) {
+            try {
+                result = await op(transaction); // run task
+                await transaction.commit();
+                ran = true;
+                break;
+            }
+            catch(e) {
+                if(e.code === '40001') { // retryable error
+                    await transaction.restart();
+                }
+                else {
+                    await transaction.rollback();
+                    client.release();
+                    throw e;
+                }
+            }
+        }
+        if(!ran) { // failed transaction
+            await transaction.rollback();
+        }
+        client.release();
+
+        return result;
+    }
 };

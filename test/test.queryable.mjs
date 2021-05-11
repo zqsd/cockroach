@@ -1,5 +1,6 @@
 import {assert} from 'chai';
 import CockroachDb from '../main.mjs';
+import Transaction from '../Transaction.mjs';
 
 describe('Queryable', function() {
     let db;
@@ -152,5 +153,11 @@ describe('Queryable', function() {
         });
     });
 
-    //transaction
+    describe('.transaction()', function() {
+        it('should give a transaction', async function() {
+            await db.transaction(async function(t) {
+                assert.instanceOf(t, Transaction);
+            });
+        });
+    });
 });
