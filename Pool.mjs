@@ -28,10 +28,6 @@ export default class CockroachDB extends Queryable {
         this._queryable.end();
     }
 
-    tx() {
-        return transaction();
-    }
-
     async transaction(op, attempts = 3) {
         const client = await this._queryable.connect();
         const transaction = new Transaction(client);
