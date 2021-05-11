@@ -17,7 +17,8 @@ Setup
 You can get a connexion pool directly :
 
 ```
-const pool = require('cockroach).createPool();
+import CockroachDB from 'cockroach';
+const db = new CockroachDB();
 ```
 
 Set environment variables to configure the server. Defaults are :

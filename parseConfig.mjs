@@ -1,9 +1,8 @@
-const fs = require('fs');
-const {Pool} = require('pg');
-const path = require('path');
-const {transaction, TransactionCancelError} = require('./transaction');
+import fs  from 'fs';
+import path from 'path';
 
-function createPool(config) {
+export default function parseConfig(cfg) {
+    const config = Object.assign({}, cfg);
     config.host = config.host || process.env.COCKROACH_HOST || '127.0.0.1';
     config.port = config.port || process.env.COCKROACH_PORT || 26257;
     config.user = config.user || process.env.COCKROACH_USER || 'root';
@@ -18,15 +17,5 @@ function createPool(config) {
             cert: fs.readFileSync(path.join(certsDir, `client.${config.user}.crt`)).toString(),
         };
     }
-
-    const pool = new Pool(config);
-
-    pool.transaction = transaction(pool);
-
-    return pool;
-};
-
-module.exports = {
-    createPool,
-    TransactionCancelError,
-};
+    return config;
+}

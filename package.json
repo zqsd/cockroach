@@ -1,8 +1,11 @@
 {
   "name": "cockroach",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "cockroach client based on pg",
-  "main": "main.js",
+  "main": "main.mjs",
+  "scripts": {
+    "test": "mocha"
+  },
   "keywords": [
     "cockroach",
     "cockroachdb",
@@ -12,6 +15,10 @@
   "author": "Clément Wiz <wiz@haxx.es>",
   "license": "ISC",
   "dependencies": {
-    "pg": "^8.2.1"
+    "pg": "^8.6.0"
+  },
+  "devDependencies": {
+    "chai": "*",
+    "mocha": "*"
   }
 }
