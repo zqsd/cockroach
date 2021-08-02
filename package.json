@@ -2,8 +2,10 @@
   "name": "cockroach",
   "version": "0.1.0",
   "description": "cockroach client based on pg",
-  "main": "main.mjs",
+  "main": "./lib/main.js",
+  "types": "./lib/main.d.ts",
   "scripts": {
+    "build": "tsc",
     "test": "mocha"
   },
   "keywords": [
@@ -18,7 +20,10 @@
     "pg": "^8.6.0"
   },
   "devDependencies": {
+    "@types/node": "^16.4.5",
+    "@types/pg": "^8.6.1",
     "chai": "*",
-    "mocha": "*"
+    "mocha": "*",
+    "typescript": "^4.3.5"
   }
 }

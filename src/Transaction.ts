@@ -1,6 +1,19 @@
-import Queryable from './Queryable.mjs';
+import pg from 'pg';
+import {Queryable} from './Queryable';
 
-export default class Transaction extends Queryable {
+export class Transaction extends Queryable {
+    _queryable : pg.ClientBase;
+
+    constructor(queryable : any) {
+        super();
+
+        this._queryable = queryable;
+    }
+
+    _query(query: string, values: any[]) : any {
+        return this._queryable.query(query, values);
+    }
+
     async begin() {
         await this.query('BEGIN; SAVEPOINT cockroach_restart;');
     }

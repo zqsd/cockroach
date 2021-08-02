@@ -1,21 +1,26 @@
 import pg from 'pg';
-import Client from './Client.mjs';
-import Queryable from './Queryable.mjs';
-import Transaction from './Transaction.mjs';
-import parseConfig from './parseConfig.mjs';
+import {Client} from './Client';
+import {Queryable} from './Queryable';
+import {Transaction} from './Transaction';
+import {ConfigInterface, parseConfig} from './parseConfig';
 
-export default class CockroachDB extends Queryable {
-    constructor(config) {
+export class CockroachDB extends Queryable {
+    _queryable : pg.Pool;
+
+    constructor(config?: ConfigInterface) {
         super();
         const pgConfig = parseConfig(config);
-        const pool = new pg.Pool(pgConfig);
-        this._queryable = pool;
+        this._queryable = new pg.Pool(pgConfig);
     }
 
-    async connect(op) {
+    _query(query: string, values: any[]) : any {
+        return this._queryable.query(query, values);
+    }
+
+    async connect(op: (client: Client) => Promise<any>) {
         const client = new Client(await this._queryable.connect());
         if(op) {
-            const result = op(client);
+            const result = await op(client);
             client.close();
             return result;
         }
@@ -28,7 +33,7 @@ export default class CockroachDB extends Queryable {
         this._queryable.end();
     }
 
-    async transaction(op, attempts = 3) {
+    async transaction(op: (transaction: Transaction) => Promise<any>, attempts = 3) {
         const client = await this._queryable.connect();
         const transaction = new Transaction(client);
 
@@ -60,4 +65,4 @@ export default class CockroachDB extends Queryable {
 
         return result;
     }
-};
+}
